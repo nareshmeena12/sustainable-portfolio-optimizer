@@ -15,7 +15,7 @@ class PortfolioEnv(gym.Env):
         super().__init__()
 
         cfg = config or {}
-        self.esg_lambda     = cfg.get("esg_lambda",    0.3)   # ESG penalty weight
+        self.esg_lambda     = cfg.get("esg_lambda",    1.0)   # ESG penalty weight
         self.initial_value  = cfg.get("initial_value", 1.0)   # normalized portfolio start value
         self.esg_drift_std  = cfg.get("esg_drift_std", 0.002) # stochastic ESG noise per step
         self.max_drawdown   = cfg.get("max_drawdown",  0.5)   # episode ends if portfolio drops 50%
@@ -86,10 +86,11 @@ class PortfolioEnv(gym.Env):
         self.esg_current = np.clip(self.esg_base + noise, 0.0, 1.0)
 
         # ESG penalty — weighted sum of (1 - esg_score) for stock holdings
-        esg_penalty = np.dot(stock_weights, 1.0 - self.esg_current)
+        weighted_esg = np.dot(stock_weights, self.esg_current)
+        esg_penalty  = max(0.0, 0.6 - weighted_esg)  # only penalize if below threshold
 
         # reward
-        reward = daily_ret * 100 - self.esg_lambda * esg_penalty - cost
+        reward = daily_ret * 100 - self.esg_lambda * esg_penalty - cost * 100
 
 
         # update state
