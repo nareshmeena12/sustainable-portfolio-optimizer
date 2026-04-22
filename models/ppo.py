@@ -165,7 +165,9 @@ class PPOUpdater:
                 self.actor.train()
                 alpha    = self.actor(s) * 10 + 1e-6
                 dist     = Dirichlet(alpha)
-                log_prob = dist.log_prob(a.clamp(1e-6, 1 - 1e-6))
+                a_safe = a.clamp(1e-4, 1 - 1e-4)
+                a_safe = a_safe / a_safe.sum(dim=-1, keepdim=True)
+                log_prob = dist.log_prob(a_safe)
                 entropy  = dist.entropy()
 
                 ratio    = torch.exp(log_prob - olp)
