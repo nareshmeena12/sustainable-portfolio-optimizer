@@ -89,7 +89,8 @@ class PortfolioEnv(gym.Env):
         esg_penalty = np.dot(stock_weights, 1.0 - self.esg_current)
 
         # reward
-        reward = daily_ret - self.esg_lambda * esg_penalty - cost
+        reward = daily_ret * 100 - self.esg_lambda * esg_penalty - cost
+
 
         # update state
         self.weights = new_weights

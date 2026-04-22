@@ -6,7 +6,6 @@ sys.path.append(".")
 from models.transformer_actor import build_actor
 from models.ppo import PPOUpdater, RolloutBuffer
 
-
 class PortfolioAgent:
     """
     Single portfolio agent managing one sector.
