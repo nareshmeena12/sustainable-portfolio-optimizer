@@ -91,11 +91,12 @@ class PortfolioAgent:
         self.actor.load_state_dict(torch.load(path, map_location=self.device))
 
     def _sharpe(self, rewards, risk_free=0.04 / 252):
-        """Daily Sharpe ratio over episode rewards."""
-        r = np.array(rewards)
-        if r.std() < 1e-8:
-            return 0.0
-        return float((r.mean() - risk_free) / r.std() * np.sqrt(252))
+     r = np.array(rewards)
+    # clip extreme values before computing sharpe
+     r = np.clip(r, -0.1, 0.1)
+     if r.std() < 1e-8:
+        return 0.0
+     return float((r.mean() - risk_free) / r.std() * np.sqrt(252))
 
 
 # ── quick test ────────────────────────────────────────────────────────────────
